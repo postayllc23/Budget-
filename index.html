@@ -308,6 +308,20 @@ select.field{appearance:none}
 .alert.rem b{color:var(--fg)}
 .warnc{color:var(--warn)}
 #aiForm .rb{width:44px;height:44px}
+/* debts cards */
+.dlist{display:grid;gap:8px}
+.dcard{background:var(--surface);border-radius:20px;padding:14px 16px;display:grid;gap:12px}
+.dcard .r1{display:flex;align-items:center;gap:12px;min-width:0}
+.dcard .r1 .ico{width:40px;height:40px;font-size:19px;flex:none}
+.dcard .nm{flex:1;min-width:0;display:grid;gap:2px}
+.dcard .nm b{font-weight:600;font-size:16.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dcard .nm span{font-size:13.5px;color:var(--muted)}
+.dcard .sum{font-weight:700;font-size:17px;text-align:right;white-space:nowrap;display:grid}
+.dcard .sum small{font-size:12px;color:var(--muted);font-weight:500}
+.dcard .r2{display:flex;gap:8px}
+.pillbtn{flex:1;border:0;border-radius:999px;padding:11px 12px;font-size:15px;font-weight:600;background:var(--surface2);color:var(--fg);transition:transform .3s var(--spring)}
+.pillbtn:active{transform:scale(.95)}
+.pillbtn.main{background:var(--fg);color:var(--bg)}
 /* home hero */
 .net{display:inline-flex;align-items:baseline;gap:6px;margin-top:8px;font-size:18px;font-weight:600;color:var(--muted)}
 .net.up{color:var(--inc)}
@@ -324,7 +338,7 @@ select.field{appearance:none}
 /* home actions & logo */
 .brand{display:flex;align-items:center;gap:10px}
 .brand img{width:34px;height:34px;border-radius:9px;flex:none}
-.acts4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:16px}
+.acts4{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:16px}
 .acts4 button{border:0;background:none;display:grid;justify-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--fg);padding:0;transition:transform .35s var(--spring)}
 .acts4 button:active{transform:scale(.9)}
 .acts4 i{width:50px;height:50px;border-radius:50%;background:var(--surface2);display:grid;place-items:center}
@@ -421,15 +435,13 @@ select.field{appearance:none}
 .toast button{padding:9px 16px;font-size:15px}
 @media (max-height:700px){#screen.fit .micw,#screen.fit .mic{width:70px;height:70px}#screen.fit .acts4 i{width:42px;height:42px}}
 
-/* ---- tab bar docked to the very bottom edge ---- */
-.tabbar{padding:0!important}
-.tabs{width:100%;max-width:none;border-radius:26px 26px 0 0;padding:8px max(10px,env(safe-area-inset-left,0px)) max(8px,calc(env(safe-area-inset-bottom,0px) - 8px)) max(10px,env(safe-area-inset-right,0px));
-  box-shadow:inset 0 1px 0 var(--glass-hi),0 -8px 24px rgba(0,0,0,.18)}
-.pill{top:8px;bottom:auto;height:calc(100% - 8px - max(8px,calc(env(safe-area-inset-bottom,0px) - 8px)))}
-#screen{padding-bottom:calc(84px + max(8px,calc(env(safe-area-inset-bottom,0px) - 8px)))}
-#screen.fit,#screen.fit.enter,#screen.fit.push,#screen.fit.pop{padding-bottom:calc(80px + max(8px,calc(env(safe-area-inset-bottom,0px) - 8px)))}
-.selbar,.toast{bottom:calc(84px + max(8px,calc(env(safe-area-inset-bottom,0px) - 8px)))}
-
+/* ---- floating tab bar, low but clear of the home indicator ---- */
+.tabbar{padding:0 max(12px,env(safe-area-inset-left,0px)) max(4px,calc(env(safe-area-inset-bottom,0px) - 20px)) max(12px,env(safe-area-inset-right,0px))!important}
+.tabs{width:100%;max-width:480px;border-radius:999px;padding:6px}
+.pill{top:6px;bottom:6px;height:auto}
+#screen{padding-bottom:calc(96px + max(4px,calc(env(safe-area-inset-bottom,0px) - 20px)))}
+#screen.fit,#screen.fit.enter,#screen.fit.push,#screen.fit.pop{padding-bottom:calc(90px + max(4px,calc(env(safe-area-inset-bottom,0px) - 20px)))}
+.selbar,.toast{bottom:calc(92px + max(4px,calc(env(safe-area-inset-bottom,0px) - 20px)))}
 /* ---- compact one-screen editor, tab bar hidden ---- */
 .tabbar{transition:transform .45s var(--ease),opacity .3s}
 body.modal .tabbar{transform:translateY(130%);opacity:0;pointer-events:none}
@@ -506,9 +518,14 @@ window.STANDALONE = true;
 
   // ---- AI via OpenRouter ----
   const AI = {
-    key(){ return LS.get("ai:key", ""); },
-    model(){ return LS.get("ai:model", "") || "openrouter/free"; },
-    modelSmart(){ return LS.get("ai:modelSmart", "") || AI.model(); }
+    provider(){ return LS.get("ai:provider", "") || (LS.get("ai:key", "") && !LS.get("gc:url", "") ? "openrouter" : "gigachat"); },
+    orKey(){ return LS.get("ai:key", ""); },
+    gcUrl(){ return LS.get("gc:url", ""); },
+    gcToken(){ let t = LS.get("gc:token", ""); if(!t){ t = Array.from(crypto.getRandomValues(new Uint8Array(18)), b => "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b % 56]).join(""); LS.set("gc:token", t); } return t; },
+    ready(){ return AI.provider() === "gigachat" ? !!AI.gcUrl() : !!AI.orKey(); },
+    key(){ return AI.ready() ? "1" : ""; },
+    model(){ return AI.provider() === "gigachat" ? (LS.get("gc:model", "") || "GigaChat-2") : (LS.get("ai:model", "") || "openrouter/free"); },
+    modelSmart(){ return AI.provider() === "gigachat" ? (LS.get("gc:modelSmart", "") || "GigaChat-2-Pro") : (LS.get("ai:modelSmart", "") || (LS.get("ai:model", "") || "openrouter/free")); }
   };
   window.AICONF = AI;
   const toDataURL = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(b); });
@@ -522,13 +539,32 @@ window.STANDALONE = true;
     }catch{ return toDataURL(file); }
   }
   async function call(input, opts = {}){
-    const key = AI.key();
+    const hasImg = !!opts.images;
+    let prov = AI.provider();
+    if(prov === "gigachat" && hasImg){ if(AI.orKey()) prov = "openrouter"; else throw {code:"images_unavailable", message:"Фото чеков работают через OpenRouter"}; }
+    if(prov === "gigachat"){
+      if(!AI.gcUrl()) throw {code:"no_key", message:"Нет адреса функции"};
+      const prompt = typeof input === "string" ? input : input.map(m => m.content).join("\n\n");
+      const ctl = new AbortController(); let timedOut = false; const timer = setTimeout(() => { timedOut = true; ctl.abort(); }, 50000);
+      let r;
+      try{ r = await fetch(AI.gcUrl(), { method:"POST", signal: ctl.signal, headers:{ "Content-Type":"application/json", "X-App-Token": AI.gcToken() },
+        body: JSON.stringify({ model: opts.modelTier === "quick" ? AI.model() : AI.modelSmart(), temperature: 0.2, messages:[{role:"user", content: prompt}] }) }); }
+      catch(e){ clearTimeout(timer); throw {code: timedOut ? "timeout" : "network", message:String(e)}; }
+      clearTimeout(timer);
+      let j = null; try{ j = await r.json(); }catch{}
+      if(!r.ok){ const m = j?.error?.message || j?.message || ("HTTP " + r.status);
+        throw {code: r.status === 401 ? (/код доступа/i.test(m) ? "bad_app_token" : "bad_key") : r.status === 429 ? "rate_limited" : r.status === 402 ? "no_credits" : "upstream_error", message: m}; }
+      const text = j?.choices?.[0]?.message?.content;
+      if(!text || !String(text).trim()) throw {code:"empty_completion", message:"Пустой ответ"};
+      return { text: String(text), truncated: j?.choices?.[0]?.finish_reason === "length", model: j?.model || "GigaChat" };
+    }
+    const key = AI.orKey();
     if(!key) throw {code:"no_key", message:"Нет ключа"};
     const prompt = typeof input === "string" ? input : input.map(m => m.content).join("\n\n");
     const imgs = opts.images ? (Array.isArray(opts.images) ? opts.images : [opts.images]) : [];
     let content = prompt;
     if(imgs.length){ content = [{type:"text", text:prompt}]; for(const f of imgs) content.push({type:"image_url", image_url:{url: await shrink(f)}}); }
-    const model = opts.modelTier === "quick" ? AI.model() : AI.modelSmart();
+    const model = opts.modelTier === "quick" ? (LS.get("ai:model", "") || "openrouter/free") : (LS.get("ai:modelSmart", "") || LS.get("ai:model", "") || "openrouter/free");
     let r; const ctl = new AbortController(); let timedOut = false;
     const timer = setTimeout(() => { timedOut = true; ctl.abort(); }, 45000);
     if(opts.signal) opts.signal.addEventListener("abort", () => ctl.abort());
@@ -781,7 +817,6 @@ function home(){
     <div class="acts4">
         <button id="aTr"><i><svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></i>Перевод</button>
         <button id="aLim"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></i>Лимиты</button>
-        <button id="aAdv"><i><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L19 9.5l-4.2 3.1L16.2 18 12 15l-4.2 3 1.4-5.4L5 9.5l5.2-1.6z"/></svg></i>Советы</button>
         <button id="aDebt"><i><svg viewBox="0 0 24 24"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="12" r="9"/></svg></i>Долги</button>
     </div>
     ${upcoming().slice(0,2).map(u=>`<button class="alert rem" data-up="${u.id}">⏰ <span><b>${esc(u.text)}</b> · ${whenText(u.days)}</span></button>`).join("")}
@@ -797,14 +832,14 @@ function home(){
       <textarea id="aiText" rows="1" placeholder="Напиши: кофе 280" aria-label="Что потратил"></textarea>
       <button type="submit" class="rb go" id="aiSend" aria-label="Записать">${ICON.up}</button>
     </form>
-    ${AICONF.key()?"":`<button class="alert" id="noKey" style="background:var(--fill);color:var(--fg)">✦ <span><b>Подключи нейросеть</b> · вставь ключ OpenRouter, чтобы записывать голосом</span></button>`}
+    ${AICONF.key()?"":`<button class="alert" id="noKey" style="background:var(--fill);color:var(--fg)">✦ <span><b>Подключи нейросеть</b> · GigaChat или OpenRouter, чтобы записывать голосом</span></button>`}
     <div id="tipBox">${S.tip?tipHtml():""}</div>
     <div id="reply">${S.last||""}</div>`;
   odo($("bal"),cap.total);
   wireProf();$("aiBtn").onclick=()=>{S.aiFrom="home";go("aiset","push");};
   document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>openAcc(b.dataset.acc));
   $("aTr").onclick=()=>openTransfer();$("aLim").onclick=()=>{S.limFrom="home";S.ym=[today.getFullYear(),today.getMonth()];go("budgets","push");};
-  $("aAdv").onclick=()=>go("stats","enter");$("aDebt").onclick=()=>{S.debtFrom="home";go("debts","push");};
+  $("aDebt").onclick=()=>{S.debtFrom="home";go("debts","push");};
   document.querySelectorAll("[data-up]").forEach(b=>b.onclick=e=>{if(e.target.closest("[data-cal]"))return;S.debtFrom="home";go("debts","push");});
   if($("noKey"))$("noKey").onclick=()=>{S.aiFrom="home";go("aiset","push");};
   if($("overAlert"))$("overAlert").onclick=()=>{S.ym=[today.getFullYear(),today.getMonth()];S.limFrom="home";go("budgets","push");};
@@ -932,7 +967,7 @@ function wireAI(){
 }
 $("photo").onchange=()=>{const f=$("photo").files[0];$("photo").value="";if(f){if(busy){toast("Подожди, разбираю предыдущую запись");return;}runAI("",f);}};
 function showReply(html,anim){S.last=html;const r=$("reply");if(!r)return;r.innerHTML=html;if(anim&&!RM&&r.firstElementChild)r.firstElementChild.classList.add("pop-up");}
-const SAMPLE_ERR={no_key:"Добавь ключ нейросети: Счета → Нейросеть и данные.",bad_key:"Ключ нейросети не подошёл. Проверь его в разделе «Нейросеть и данные».",no_credits:"На OpenRouter закончился баланс или лимит ключа.",blocked:"OpenRouter отказал в доступе. Попробуй другую модель в настройках.",network:"Нет связи с нейросетью. Проверь интернет.",upstream_error:"Нейросеть временно недоступна. Попробуй через минуту.",empty_completion:"Нейросеть ничего не ответила. Попробуй ещё раз.",not_granted:"Странице не разрешили обращаться к Claude. Обнови страницу и нажми «Разрешить».",timeout:"Нейросеть долго не отвечает. Попробуй ещё раз.",rate_limited:"Лимит запросов исчерпан (бесплатно — 50 в день). Попробуй позже.",invalid_json:"Не понял ответ. Попробуй ещё раз.",sampling_disabled:"Claude недоступен для этого аккаунта.",session_expired:"Нужно заново войти в аккаунт.",image_rejected:"Не получилось прочитать фото.",images_unavailable:"Фото здесь не поддерживается."};
+const SAMPLE_ERR={no_key:"Подключи нейросеть: Счета → Нейросеть и данные.",bad_key:"Ключ нейросети не подошёл. Проверь его в разделе «Нейросеть и данные».",bad_app_token:"Код доступа не совпадает с APP_TOKEN в функции Yandex Cloud.",no_credits:"На OpenRouter закончился баланс или лимит ключа.",blocked:"OpenRouter отказал в доступе. Попробуй другую модель в настройках.",network:"Нет связи с нейросетью. Проверь интернет.",upstream_error:"Нейросеть временно недоступна. Попробуй через минуту.",empty_completion:"Нейросеть ничего не ответила. Попробуй ещё раз.",not_granted:"Странице не разрешили обращаться к Claude. Обнови страницу и нажми «Разрешить».",timeout:"Нейросеть долго не отвечает. Попробуй ещё раз.",rate_limited:"Лимит запросов исчерпан (бесплатно — 50 в день). Попробуй позже.",invalid_json:"Не понял ответ. Попробуй ещё раз.",sampling_disabled:"Claude недоступен для этого аккаунта.",session_expired:"Нужно заново войти в аккаунт.",image_rejected:"Не получилось прочитать фото.",images_unavailable:"Фото здесь не поддерживается."};
 async function runAI(text,file){
   if(S.view!=="home")go("home","enter");
   const q=`<div class="q">${file?"📷 Фото чека":"«"+esc(text)+"»"}</div>`;
@@ -1178,7 +1213,7 @@ function more(){
   const limTotal=Object.values(S.set.budgets).reduce((s,v)=>s+(+v||0),0);
   const groups=Object.keys(ACC_KINDS).map(k=>[k,S.set.accounts.filter(a=>(a.kind||"other")===k)]).filter(([k,l])=>l.length);
   $("screen").innerHTML=`<div class="ptitle"><div class="large">Счета</div>${profBtn()}</div>
-    <div class="group menu" style="margin-bottom:12px"><button id="toAI"><span class="ico" style="background:var(--inc);color:#fff">✦</span><span class="nm">Нейросеть и данные<small>${AICONF.key()?"ключ добавлен · резервная копия":"нужно вставить ключ OpenRouter"}</small></span><span class="chev">›</span></button></div>
+    <div class="group menu" style="margin-bottom:12px"><button id="toAI"><span class="ico" style="background:var(--inc);color:#fff">✦</span><span class="nm">Нейросеть и данные<small>${AICONF.key()?(AICONF.provider()==="gigachat"?"GigaChat":"OpenRouter")+" · резервная копия":"нужно подключить нейросеть"}</small></span><span class="chev">›</span></button></div>
     <div class="group menu">
       ${groups.map(([k,l])=>l.map(a=>`<button data-acc="${a.id}"><span class="ico">${esc(a.icon)}</span><span class="nm">${esc(a.name)}<small>${ACC_KINDS[k][0]}${a.exclude?" · не в капитале":""}</small></span><span class="sub">${fmt(accBalance(a.id))}</span><span class="chev">›</span></button>`).join("")).join("")}
       <button id="newAcc"><span class="ico" style="color:var(--tint)">＋</span><span class="nm" style="color:var(--tint)">Новый счёт</span></button>
@@ -1432,16 +1467,17 @@ function debtsScreen(){
   const od=openDebts(),lent=od.filter(d=>d.dir==="lent"),bor=od.filter(d=>d.dir==="borrowed");
   const rems=(S.set.reminders||[]).filter(r=>!r.done).sort((a,b)=>a.date.localeCompare(b.date));
   const dueTag=d=>{if(!d)return "без срока";const k=dayDiff(d);return `<span class="${k<0?"exp":k<=2?"warnc":""}">до ${dShort(d)} · ${whenText(k)}</span>`;};
-  const drow=d=>`<div class="rec"><span class="ico" style="width:36px;height:36px;font-size:17px;border-radius:10px">🤝</span><span class="nm"><div>${esc(d.person)} · ${fmt(debtLeft(d))}${debtLeft(d)<d.amount?` <span class="lbl">из ${fmt(d.amount)}</span>`:""}</div><div>${dueTag(d.due)}</div></span>
-    ${d.due?`<button class="x" style="color:var(--fg)" data-cal="debt:${d.id}" aria-label="В календарь">🔔</button>`:""}<button class="btn ghost sm" data-paid="${d.id}" style="padding:9px 12px;font-size:14px">${d.dir==="lent"?"Вернули":"Вернул"}</button></div>`;
+  const drow=d=>{const left=debtLeft(d);return `<div class="dcard"><div class="r1"><span class="ico">🤝</span><div class="nm"><b>${esc(d.person)}</b><span>${dueTag(d.due)}</span></div>
+    <div class="sum ${d.dir==="lent"?"inc":"exp"}">${fmt(left)}${left<d.amount?`<small>из ${fmt(d.amount)}</small>`:""}</div></div>
+    <div class="r2">${d.due?`<button class="pillbtn" data-cal="debt:${d.id}">🔔 В календарь</button>`:""}<button class="pillbtn main" data-paid="${d.id}">${d.dir==="lent"?"Вернули":"Я вернул"}</button></div></div>`;};
   $("screen").innerHTML=`${navBack(bt)}<div class="large">Долги</div>
     <div class="tiles"><div class="card"><div class="lbl">Мне должны</div><b class="inc">${fmt(lent.reduce((s,d)=>s+debtLeft(d),0))}</b></div><div class="card"><div class="lbl">Я должен</div><b class="exp">${fmt(bor.reduce((s,d)=>s+debtLeft(d),0))}</b></div></div>
-    ${lent.length?`<div class="hdr"><span>Мне должны</span></div><div class="group">${lent.map(drow).join("")}</div>`:""}
-    ${bor.length?`<div class="hdr"><span>Я должен</span></div><div class="group">${bor.map(drow).join("")}</div>`:""}
+    ${lent.length?`<div class="hdr"><span>Мне должны</span></div><div class="dlist">${lent.map(drow).join("")}</div>`:""}
+    ${bor.length?`<div class="hdr"><span>Я должен</span></div><div class="dlist">${bor.map(drow).join("")}</div>`:""}
     <div class="hdr"><span>Напоминания</span></div>
-    <div class="group">${rems.length?rems.map(r=>`<div class="rec"><span class="ico" style="width:36px;height:36px;font-size:17px;border-radius:10px">⏰</span><span class="nm"><div>${esc(r.text)}${r.amount?" · "+fmt(r.amount):""}</div><div>${dueTag(r.date)}</div></span>
-      <button class="x" style="color:var(--fg)" data-cal="rem:${r.id}" aria-label="В календарь">🔔</button><button class="btn ghost sm" data-done="${r.id}" style="padding:9px 12px;font-size:14px">Готово</button></div>`).join("")
-      :`<div class="rec"><span class="nm"><div>Пока нет</div><div>Скажи: «напомни 30-го оплатить штраф 1500»</div></span></div>`}</div>
+    <div class="dlist">${rems.length?rems.map(r=>`<div class="dcard"><div class="r1"><span class="ico">⏰</span><div class="nm"><b>${esc(r.text)}</b><span>${dueTag(r.date)}</span></div>${r.amount?`<div class="sum">${fmt(r.amount)}</div>`:""}</div>
+      <div class="r2"><button class="pillbtn" data-cal="rem:${r.id}">🔔 В календарь</button><button class="pillbtn main" data-done="${r.id}">Готово</button></div></div>`).join("")
+      :`<div class="dcard"><div class="nm"><b>Пока нет</b><span>Скажи: «напомни 30-го оплатить штраф 1500»</span></div></div>`}</div>
     <div class="hdr"><span>Новый долг</span></div>
     <form class="card" id="dForm" style="display:grid;gap:10px">
       <div class="seg"><button type="button" data-dd="lent" aria-pressed="${(S.ddir||"lent")==="lent"}">Я дал</button><button type="button" data-dd="borrowed" aria-pressed="${S.ddir==="borrowed"}">Я взял</button></div>
@@ -1465,18 +1501,29 @@ function debtsScreen(){
 
 // ================= AI KEY & BACKUP (standalone) =================
 function aiScreen(){
-  const k=AICONF.key();
-  const back=S.aiFrom||"more";
+  const back=S.aiFrom||"more";const L=k=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):"";}catch{return "";}};
+  const prov=S.aiProv||AICONF.provider();
   $("screen").innerHTML=`${navBack(back==="home"?"Обзор":"Счета")}<div class="large">Нейросеть и данные</div>
-    <div class="hdr"><span>Нейросеть (OpenRouter)</span></div>
+    <div class="seg" style="margin:4px 0 2px"><button data-pv="gigachat" aria-pressed="${prov==="gigachat"}">GigaChat (Сбер)</button><button data-pv="openrouter" aria-pressed="${prov==="openrouter"}">OpenRouter</button></div>
+    ${prov==="gigachat"?`
+    <div class="hdr"><span>GigaChat через Yandex Cloud</span></div>
     <div class="card" style="display:grid;gap:12px">
-      <label class="lab"><span>Ключ API</span><input class="field" id="kKey" type="password" value="${esc(k)}" placeholder="sk-or-v1-…" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
-      <label class="lab"><span>Модель для голосовых записей</span><input class="field" id="kM" value="${esc(localStorage.getItem("ai:model")?JSON.parse(localStorage.getItem("ai:model")):"")}" placeholder="openrouter/free" autocapitalize="off" spellcheck="false"></label>
-      <label class="lab"><span>Модель для советов и фото чеков</span><input class="field" id="kM2" value="${esc(localStorage.getItem("ai:modelSmart")?JSON.parse(localStorage.getItem("ai:modelSmart")):"")}" placeholder="как для записей" autocapitalize="off" spellcheck="false"></label>
-      <div class="lbl">Ключ хранится только на этом телефоне. Бесплатная модель openrouter/free даёт до 50 запросов в день. Поставь лимит расходов ключа на сайте openrouter.ai.</div>
-      <div class="actions" style="margin-top:0"><button class="btn ghost sm" id="kTest">Проверить</button><button class="btn primary" id="kSave">Сохранить</button></div>
-      <div class="lbl" id="kRes"></div>
-    </div>
+      <label class="lab"><span>Адрес функции (ссылка для вызова)</span><input class="field" id="gUrl" value="${esc(L("gc:url"))}" placeholder="https://functions.yandexcloud.net/…" autocapitalize="off" spellcheck="false" inputmode="url"></label>
+      <div class="lab"><span>Код доступа — вставь его в функцию как APP_TOKEN</span>
+        <div style="display:flex;gap:8px"><input class="field" id="gTok" value="${esc(AICONF.gcToken())}" readonly style="font-family:ui-monospace,Menlo,monospace;font-size:15px"><button class="btn ghost sm" id="gCopy" type="button">Копировать</button></div></div>
+      <div class="form2"><label class="lab"><span>Модель для записей</span><input class="field" id="gM" value="${esc(L("gc:model"))}" placeholder="GigaChat-2" autocapitalize="off" spellcheck="false"></label>
+        <label class="lab"><span>Для советов</span><input class="field" id="gM2" value="${esc(L("gc:modelSmart"))}" placeholder="GigaChat-2-Pro" autocapitalize="off" spellcheck="false"></label></div>
+      <div class="lbl">Без суточных лимитов: бесплатный запас Сбера на год. Фото чеков пойдут через OpenRouter, если там тоже есть ключ.</div>
+    </div>`:`
+    <div class="hdr"><span>OpenRouter</span></div>
+    <div class="card" style="display:grid;gap:12px">
+      <label class="lab"><span>Ключ API</span><input class="field" id="kKey" type="password" value="${esc(L("ai:key"))}" placeholder="sk-or-v1-…" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <label class="lab"><span>Модель для голосовых записей</span><input class="field" id="kM" value="${esc(L("ai:model"))}" placeholder="openrouter/free" autocapitalize="off" spellcheck="false"></label>
+      <label class="lab"><span>Модель для советов и фото чеков</span><input class="field" id="kM2" value="${esc(L("ai:modelSmart"))}" placeholder="как для записей" autocapitalize="off" spellcheck="false"></label>
+      <div class="lbl">Ключ хранится только на этом телефоне. Бесплатная модель openrouter/free даёт до 50 запросов в день.</div>
+    </div>`}
+    <div class="actions"><button class="btn ghost sm" id="kTest">Проверить</button><button class="btn primary" id="kSave">Сохранить</button></div>
+    <div class="lbl" id="kRes" style="margin:10px 16px 0"></div>
     <div class="hdr"><span>Резервная копия</span></div>
     <div class="card" style="display:grid;gap:10px">
       <div class="lbl">Все записи хранятся на этом телефоне. Время от времени сохраняй копию в «Файлы», чтобы ничего не потерять.</div>
@@ -1485,13 +1532,17 @@ function aiScreen(){
       <div class="lbl" id="bRes"></div>
     </div>`;
   wireBack(back);
-  const save=()=>{const set=(n,v)=>{try{if(v)localStorage.setItem(n,JSON.stringify(v));else localStorage.removeItem(n);}catch{}};
-    set("ai:key",$("kKey").value.trim());set("ai:model",$("kM").value.trim());set("ai:modelSmart",$("kM2").value.trim());};
-  $("kSave").onclick=()=>{save();toast("Сохранено");};
+  const set=(n,v)=>{try{if(v)localStorage.setItem(n,JSON.stringify(v));else localStorage.removeItem(n);}catch{}};
+  const save=()=>{set("ai:provider",prov);
+    if(prov==="gigachat"){set("gc:url",$("gUrl").value.trim());set("gc:model",$("gM").value.trim());set("gc:modelSmart",$("gM2").value.trim());}
+    else{set("ai:key",$("kKey").value.trim());set("ai:model",$("kM").value.trim());set("ai:modelSmart",$("kM2").value.trim());}};
+  document.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{S.aiProv=b.dataset.pv;render();});
+  if($("gCopy"))$("gCopy").onclick=async()=>{try{await navigator.clipboard.writeText(AICONF.gcToken());toast("Код скопирован");}catch{$("gTok").select();toast("Выдели и скопируй код");}};
+  $("kSave").onclick=()=>{save();S.aiProv=null;toast("Сохранено");};
   $("kTest").onclick=async()=>{save();const r=$("kRes");r.innerHTML='<span class="spin"></span>Проверяю…';
     try{const sample=await claude.use("sample");const t0=performance.now();const res=await sample('Ответь одним словом: "работает"',{modelTier:"quick"});
-      r.innerHTML=`✅ Работает за ${((performance.now()-t0)/1000).toFixed(1).replace(".",",")} с · модель ${esc(res.model||AICONF.model())}`;}
-    catch(e){r.textContent="❌ "+(SAMPLE_ERR[e?.code]||e?.message||"Ошибка");}};
+      r.innerHTML=`✅ Работает за ${((performance.now()-t0)/1000).toFixed(1).replace(".",",")} с · ${esc(res.model||AICONF.model())}`;}
+    catch(e){r.textContent="❌ "+(SAMPLE_ERR[e?.code]||e?.message||"Ошибка")+(e?.message&&SAMPLE_ERR[e?.code]?" ("+e.message+")":"");}};
   $("bExp").onclick=async()=>{const data={format:"kb1",exported:new Date().toISOString(),data:LOCALDB.exportAll()};
     const name=`budget-backup-${iso(new Date())}.json`;const blob=new Blob([JSON.stringify(data)],{type:"application/json"});
     try{const f=new File([blob],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});$("bRes").textContent="Копия готова.";return;}}catch(e){if(e?.name==="AbortError")return;}
