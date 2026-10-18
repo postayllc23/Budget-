@@ -39,7 +39,32 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--tint);outline-offset:2px}
-.wrap{max-width:520px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:6px calc(120px + env(safe-area-inset-bottom,0px))}
+html,body{height:100%;overflow:hidden}
+.wrap{position:fixed;inset:0;max-width:520px;margin:0 auto;display:flex;flex-direction:column;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(6px + env(safe-area-inset-top,0px)) 0}
+.wrap>.notice{flex:none}
+#screen{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px));margin-inline:-4px;padding-inline:4px}
+#screen::-webkit-scrollbar{display:none}
+/* home is a fixed one-screen layout: only the operations list scrolls */
+#screen.fit,#screen.fit.enter,#screen.fit.push,#screen.fit.pop{overflow:hidden;display:flex;flex-direction:column;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+#screen.fit>*{flex:none}
+#screen.fit>#txList{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:20px;padding-bottom:12px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent)}
+#screen.fit>#txList::-webkit-scrollbar{display:none}
+#screen.fit .day:first-child{margin-top:4px}
+#screen.fit .ptitle{margin:4px 2px 8px}
+#screen.fit .card{padding:14px 16px}
+
+#screen.fit .accs{margin-top:10px}
+#screen.fit .acts4{margin-top:12px}
+#screen.fit .acts4 i{width:44px;height:44px}
+#screen.fit .voice{padding:12px 0 2px;gap:6px;grid-template-columns:auto;}
+#screen.fit .micw,#screen.fit .mic{width:84px;height:84px}
+#screen.fit .mic svg{width:32px;height:32px}
+#screen.fit .voice .cap{font-size:13.5px}
+#screen.fit .hdr{margin:14px 16px 6px}
+#screen.fit .alert{margin-top:8px;padding:9px 12px;font-size:14px}
+#screen.fit .reply{margin-top:8px;max-height:30vh;overflow-y:auto}
+@media (max-height:700px){#screen.fit .mline{display:none}#screen.fit .acts4{margin-top:8px;gap:2px}#screen.fit .acts4 button{font-size:11px;gap:3px}#screen.fit .acts4 i{width:36px;height:36px}#screen.fit .acts4 svg{width:18px;height:18px}#screen.fit .voice{padding-top:6px}#screen.fit .micw,#screen.fit .mic{width:56px;height:56px}#screen.fit .mic svg{width:24px;height:24px}#screen.fit .hero .bal{font-size:40px}}
 .glass{background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(190%);backdrop-filter:blur(26px) saturate(190%);
   box-shadow:inset 0 1px 0 var(--glass-hi),inset 0 0 0 .5px var(--glass-hi),0 0 0 .5px var(--glass-rim),0 10px 30px rgba(0,0,0,.12)}
 .nav{display:flex;align-items:center;gap:8px;min-height:44px;margin-top:2px}
@@ -53,6 +78,7 @@ button{cursor:pointer}
 .ptitle .large{margin:0}
 .prof{border:0;border-radius:999px;padding:7px 12px 7px 9px;display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600;max-width:55%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prof span:last-child{color:var(--muted);font-size:12px}
+.prof.sm span:nth-child(2),.prof.sm span:last-child{display:none}.prof.sm{padding:8px 10px;font-size:18px}
 .card{background:var(--surface);border-radius:20px;padding:16px}
 .group{background:var(--surface);border-radius:20px;overflow:hidden}
 .lbl{font-size:13px;color:var(--muted)}
@@ -75,12 +101,39 @@ button{cursor:pointer}
   box-shadow:inset 0 1px 1px rgba(255,255,255,.4),0 10px 30px rgba(0,0,0,.35),0 0 0 6px var(--fill);transition:transform .45s var(--spring),background .3s,color .3s}
 .mic svg{width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mic:active{transform:scale(.9)}
-.on .mic{background:var(--exp);color:#fff}
-.on .ring{background:var(--exp);animation:ring 1.6s var(--ease) infinite}
-.on .ring.r2{animation-delay:.8s}
+/* voice orb — layered colour blobs drifting inside a glass sphere */
+.mic{background:radial-gradient(circle at 50% 55%,#15151a,#000 75%)!important;color:#fff!important;overflow:hidden;isolation:isolate;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),0 14px 44px rgba(33,195,122,.28),0 0 70px rgba(94,155,255,.22)!important}
+.orb{position:absolute;inset:-8%;border-radius:50%;filter:blur(9px) saturate(1.5);animation:orbspin 18s linear infinite}
+.orb i{position:absolute;width:62%;height:62%;border-radius:50%;mix-blend-mode:screen;opacity:.95;animation:var(--a) var(--d,7s) ease-in-out infinite}
+.orb i:nth-child(1){background:#21C37A;left:4%;top:16%;--a:o1}
+.orb i:nth-child(2){background:#5E9BFF;right:2%;top:6%;--a:o2;--d:8s}
+.orb i:nth-child(3){background:#B48CFF;left:22%;bottom:2%;--a:o3;--d:9s}
+.orb i:nth-child(4){background:#3FD0C9;width:40%;height:40%;left:34%;top:34%;--a:o4;--d:5s}
+@keyframes orbspin{to{transform:rotate(360deg)}}
+@keyframes o1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(28%,-14%) scale(1.18)}66%{transform:translate(8%,22%) scale(.86)}}
+@keyframes o2{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(-26%,24%) scale(.88)}70%{transform:translate(-8%,-10%) scale(1.2)}}
+@keyframes o3{0%,100%{transform:translate(0,0) scale(1)}30%{transform:translate(16%,-26%) scale(1.15)}60%{transform:translate(-20%,-6%) scale(.9)}}
+@keyframes o4{0%,100%{transform:scale(.8);opacity:.55}50%{transform:scale(1.35);opacity:1}}
+.mic::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:1;
+  background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.6),rgba(255,255,255,0) 32%),radial-gradient(circle at 50% 115%,rgba(0,0,0,.55),transparent 58%);
+  box-shadow:inset 0 -8px 18px rgba(0,0,0,.35),inset 0 2px 2px rgba(255,255,255,.25)}
+.mic .mi{position:relative;z-index:2;display:grid;place-items:center;transition:transform .4s var(--spring),opacity .3s}
+.mic .mi svg{filter:drop-shadow(0 1px 4px rgba(0,0,0,.55))}
+/* listening: faster, brighter, breathing */
+.on .orb{animation-duration:4s;filter:blur(7px) saturate(1.9)}
+.on .orb i{animation-duration:calc(var(--d,7s) * .3)}
+.on .mic{animation:breathe .9s ease-in-out infinite alternate}
+.on .mic .mi{transform:scale(.6);opacity:.9}
+@keyframes breathe{from{transform:scale(1)}to{transform:scale(1.07)}}
+.on .ring{background:radial-gradient(circle,rgba(94,155,255,.0) 40%,rgba(94,155,255,.55) 62%,rgba(33,195,122,.35) 75%,transparent 78%);animation:ring 1.8s var(--ease) infinite}
+.on .ring.r2{animation-delay:.9s}
+/* processing: whole orb swirls */
+.busy .orb{animation-duration:1.6s}
+.busy .orb i{animation-duration:calc(var(--d,7s) * .45)}
 @keyframes ring{0%{transform:scale(1);opacity:.35}100%{transform:scale(1.7);opacity:0}}
 .voice .cap{font-size:15px;color:var(--muted);text-align:center;min-height:20px}
-.on .cap{color:var(--exp)}
+.on .cap{color:var(--fg)}
 .compose{display:flex;gap:6px;align-items:flex-end;border-radius:26px;padding:5px;margin-top:6px}
 .compose textarea{flex:1;min-width:0;border:0;background:none;resize:none;padding:10px 8px;min-height:42px;max-height:140px;font-size:17px;line-height:1.3;outline:none}
 .rb{width:42px;height:42px;border-radius:50%;border:0;display:grid;place-items:center;flex:none;background:none;color:var(--muted);transition:transform .3s var(--spring),opacity .2s}
@@ -130,7 +183,7 @@ button{cursor:pointer}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;pointer-events:none;
   padding:0 max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 .tabs{pointer-events:auto;display:flex;gap:0;padding:5px;border-radius:999px;position:relative;max-width:100%}
-.tabs button{position:relative;z-index:1;border:0;background:none;border-radius:999px;padding:7px 10px 6px;display:grid;justify-items:center;gap:1px;font-size:10.5px;font-weight:600;color:var(--muted);min-width:70px;transition:color .25s}
+.tabs button{position:relative;z-index:1;border:0;background:none;border-radius:999px;padding:7px 6px 6px;display:grid;justify-items:center;gap:1px;font-size:10.5px;font-weight:600;color:var(--muted);min-width:62px;transition:color .25s}
 .tabs button svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .tabs button[aria-current="page"]{color:var(--fg)}
 .pill{position:absolute;top:5px;bottom:5px;border-radius:999px;background:var(--fill);transition:left .45s var(--spring),width .45s var(--spring)}
@@ -244,6 +297,19 @@ select.field{appearance:none}
 /* invest */
 .pl{font-size:15px;margin-top:4px;font-weight:600}
 .stale{font-size:12.5px;color:var(--muted);margin-top:8px}
+/* home hero */
+.net{display:inline-flex;align-items:baseline;gap:6px;margin-top:8px;font-size:18px;font-weight:600;color:var(--muted)}
+.net.up{color:var(--inc)}
+.net.down{color:var(--exp)}
+.net .arr{font-size:11px}
+.net .per{color:var(--muted);font-weight:500;font-size:15px}
+.hero{text-align:center;padding:10px 0 4px}
+.hero .lbl{font-size:14px}
+.hero .bal{font-size:clamp(40px,14vw,60px);letter-spacing:-.05em;line-height:1.05;margin-top:4px}
+.hero .mline{margin-top:8px}
+.hero .mline.sub{font-size:13.5px;margin-top:3px}
+.accs.center>:first-child{margin-left:auto}.accs.center>:last-child{margin-right:auto}
+#screen.fit .voice{flex:none;padding:22px 0 4px}
 /* home actions & logo */
 .brand{display:flex;align-items:center;gap:10px}
 .brand img{width:34px;height:34px;border-radius:9px;flex:none}
@@ -305,6 +371,7 @@ select.field{appearance:none}
 <div class="tabbar"><div class="tabs glass" id="tabs">
   <span class="pill" id="pill"></span>
   <button data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Обзор</button>
+  <button data-tab="ops"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>Операции</button>
   <button data-tab="stats"><svg viewBox="0 0 24 24"><path d="M12 3v9l7.5 4.5"/><circle cx="12" cy="12" r="9"/></svg>Аналитика</button>
   <button data-tab="invest"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Инвестиции</button>
   <button data-tab="more"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M16 15h2"/></svg>Счета</button>
@@ -376,15 +443,18 @@ window.STANDALONE = true;
     let content = prompt;
     if(imgs.length){ content = [{type:"text", text:prompt}]; for(const f of imgs) content.push({type:"image_url", image_url:{url: await shrink(f)}}); }
     const model = opts.modelTier === "quick" ? AI.model() : AI.modelSmart();
-    let r;
+    let r; const ctl = new AbortController(); let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; ctl.abort(); }, 45000);
+    if(opts.signal) opts.signal.addEventListener("abort", () => ctl.abort());
     try{
       r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method:"POST", signal: opts.signal,
+        method:"POST", signal: ctl.signal,
         headers:{ "Authorization":"Bearer " + key, "Content-Type":"application/json", "X-Title":"Karmannyi budzhet" },
         body: JSON.stringify({ model, temperature: 0.2, messages:[{role:"user", content}] })
       });
-    }catch(e){ throw {code: e && e.name === "AbortError" ? "cancelled" : "network", message:String(e)}; }
+    }catch(e){ clearTimeout(timer); throw {code: timedOut ? "timeout" : e && e.name === "AbortError" ? "cancelled" : "network", message:String(e)}; }
     let j = null; try{ j = await r.json(); }catch{}
+    clearTimeout(timer);
     if(!r.ok){
       const code = r.status === 401 ? "bad_key" : r.status === 402 ? "no_credits" : r.status === 429 ? "rate_limited" : r.status === 403 ? "blocked" : "upstream_error";
       throw {code, message: j?.error?.message || ("HTTP " + r.status)};
@@ -531,18 +601,19 @@ function writeWatch(){if(!S.db)return;const m={};for(const [pid,set] of Object.e
   S.db.doc("meta/watch").set({items}).catch(()=>{lastWatch="";});}
 
 // ---------- navigation ----------
-const TAB_OF={aiset:"more",transfer:"home",home:"home",stats:"stats",invest:"invest",more:"more",budgets:"more",recurring:"more",accEdit:"more",add:"home",assetEdit:"invest",profiles:"home"};
-const DEPTH={aiset:1,transfer:1,home:0,stats:0,invest:0,more:0,budgets:1,recurring:1,accEdit:1,add:1,assetEdit:1,profiles:1};
+const TAB_OF={aiset:"more",ops:"ops",transfer:"home",home:"home",stats:"stats",invest:"invest",more:"more",budgets:"more",recurring:"more",accEdit:"more",add:"home",assetEdit:"invest",profiles:"home"};
+const DEPTH={aiset:1,ops:0,transfer:1,home:0,stats:0,invest:0,more:0,budgets:1,recurring:1,accEdit:1,add:1,assetEdit:1,profiles:1};
 function go(v,dir){
   if(rec)stopMic(); exitSelect(true);
   const from=S.view;S.view=v;S.drill=null;
   const mode=dir||(DEPTH[v]>DEPTH[from]?"push":DEPTH[v]<DEPTH[from]&&TAB_OF[v]===TAB_OF[from]?"pop":"enter");
-  render(mode);window.scrollTo({top:0});
+  render(mode);$("screen").scrollTop=0;
 }
 function render(mode){
-  ({home,stats,invest,more,budgets,recurring,transfer:transferScreen,accEdit:accEditScreen,add:addScreen,assetEdit:assetEditScreen,profiles:profilesScreen,aiset:aiScreen})[S.view]();
-  const sc=$("screen");
-  if(mode&&!RM){[...sc.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,12)));sc.className="";void sc.offsetWidth;sc.className=mode;clearTimeout(render.t);render.t=setTimeout(()=>sc.className="",900);}
+  ({home,ops:opsScreen,stats,invest,more,budgets,recurring,transfer:transferScreen,accEdit:accEditScreen,add:addScreen,assetEdit:assetEditScreen,profiles:profilesScreen,aiset:aiScreen})[S.view]();
+  const sc=$("screen");const fit=S.view==="home"||S.view==="ops";
+  if(mode&&!RM){[...sc.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,12)));sc.className=fit?"fit":"";void sc.offsetWidth;sc.className=(fit?"fit ":"")+mode;clearTimeout(render.t);render.t=setTimeout(()=>sc.className=fit?"fit":"",900);}
+  else sc.className=fit?"fit":"";
   moveTab();
 }
 function moveTab(){const cur=TAB_OF[S.view];const tabs=$("tabs");
@@ -566,24 +637,24 @@ function countUp(el,to){const from=S.shownBal;S.shownBal=to;if(RM||from===to){el
 function home(){
   const cap=capital(),t=totals(thisYm),over=overspends(thisYm);
   $("screen").innerHTML=`
-    <div class="ptitle"><div class="brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIzMjMyNyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA1MDUwNiIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImcxIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNEJFMzlBIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTRBODY2Ii8+PC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZzIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNDOUM5Q0YiLz48L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnMyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZBNkE3MiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNBM0E0MCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmIiBzdG9wLW9wYWNpdHk9Ii4yMiIvPjxzdG9wIG9mZnNldD0iLjUiIHN0b3AtY29sb3I9IiNmZmYiIHN0b3Atb3BhY2l0eT0iMCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9Imdsb3ciIGN4PSIuNSIgY3k9Ii41NSIgcj0iLjUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIxQzM3QSIgc3RvcC1vcGFjaXR5PSIuMjgiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMyMUMzN0EiIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+CiAgICA8Y2xpcFBhdGggaWQ9InNxIj48cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiByeD0iMjMwIi8+PC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI3NxKSI+CiAgICA8cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiBmaWxsPSJ1cmwoI2JnKSIvPgogICAgPGNpcmNsZSBjeD0iNTEyIiBjeT0iNTQwIiByPSI0MjAiIGZpbGw9InVybCgjZ2xvdykiLz4KICAgIDxnIHRyYW5zZm9ybT0icm90YXRlKC05MCA1MTIgNTEyKSIgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxMTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICAgIDwhLS0gY2lyY3VtZmVyZW5jZSAyKnBpKjI2OCA9IDE2ODMuOSAtLT4KICAgICAgPGNpcmNsZSBjeD0iNTEyIiBjeT0iNTEyIiByPSIyNjgiIHN0cm9rZT0idXJsKCNnMykiIHN0cm9rZS1kYXNoYXJyYXk9IjM5MCAxNjgzLjkiIHN0cm9rZS1kYXNob2Zmc2V0PSItMTE5NSIvPgogICAgICA8Y2lyY2xlIGN4PSI1MTIiIGN5PSI1MTIiIHI9IjI2OCIgc3Ryb2tlPSJ1cmwoI2cyKSIgc3Ryb2tlLWRhc2hhcnJheT0iMzAwIDE2ODMuOSIgc3Ryb2tlLWRhc2hvZmZzZXQ9Ii03MzciLz4KICAgICAgPGNpcmNsZSBjeD0iNTEyIiBjeT0iNTEyIiByPSIyNjgiIHN0cm9rZT0idXJsKCNnMSkiIHN0cm9rZS1kYXNoYXJyYXk9IjUyMCAxNjgzLjkiIHN0cm9rZS1kYXNob2Zmc2V0PSItNTkiLz4KICAgIDwvZz4KICAgIDxnIGZpbGw9IiNmZmYiPgogICAgICA8cmVjdCB4PSI0MzIiIHk9IjUzMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjgwIiByeD0iMjAiIG9wYWNpdHk9Ii41NSIvPgogICAgICA8cmVjdCB4PSI0OTIiIHk9IjQ3MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjE0MCIgcng9IjIwIiBvcGFjaXR5PSIuOCIvPgogICAgICA8cmVjdCB4PSI1NTIiIHk9IjQyMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjE5MCIgcng9IjIwIiBmaWxsPSIjMjFDMzdBIi8+CiAgICA8L2c+CiAgICA8cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSI1MjAiIGZpbGw9InVybCgjc2hlZW4pIi8+CiAgICA8cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTAxOCIgaGVpZ2h0PSIxMDE4IiByeD0iMjI4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIuMTQiIHN0cm9rZS13aWR0aD0iNiIvPgogIDwvZz4KPC9zdmc+Cg==" alt=""><div class="large">Бюджет</div></div>${profBtn()}</div>
-    <div class="card">
+    <div class="ptitle"><div class="brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIzMjMyNyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA1MDUwNiIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImcxIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNEJFMzlBIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTRBODY2Ii8+PC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZzIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNDOUM5Q0YiLz48L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnMyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZBNkE3MiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNBM0E0MCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmIiBzdG9wLW9wYWNpdHk9Ii4yMiIvPjxzdG9wIG9mZnNldD0iLjUiIHN0b3AtY29sb3I9IiNmZmYiIHN0b3Atb3BhY2l0eT0iMCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9Imdsb3ciIGN4PSIuNSIgY3k9Ii41NSIgcj0iLjUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIxQzM3QSIgc3RvcC1vcGFjaXR5PSIuMjgiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMyMUMzN0EiIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+CiAgICA8Y2xpcFBhdGggaWQ9InNxIj48cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiByeD0iMjMwIi8+PC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI3NxKSI+CiAgICA8cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiBmaWxsPSJ1cmwoI2JnKSIvPgogICAgPGNpcmNsZSBjeD0iNTEyIiBjeT0iNTQwIiByPSI0MjAiIGZpbGw9InVybCgjZ2xvdykiLz4KICAgIDxnIHRyYW5zZm9ybT0icm90YXRlKC05MCA1MTIgNTEyKSIgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxMTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICAgIDwhLS0gY2lyY3VtZmVyZW5jZSAyKnBpKjI2OCA9IDE2ODMuOSAtLT4KICAgICAgPGNpcmNsZSBjeD0iNTEyIiBjeT0iNTEyIiByPSIyNjgiIHN0cm9rZT0idXJsKCNnMykiIHN0cm9rZS1kYXNoYXJyYXk9IjM5MCAxNjgzLjkiIHN0cm9rZS1kYXNob2Zmc2V0PSItMTE5NSIvPgogICAgICA8Y2lyY2xlIGN4PSI1MTIiIGN5PSI1MTIiIHI9IjI2OCIgc3Ryb2tlPSJ1cmwoI2cyKSIgc3Ryb2tlLWRhc2hhcnJheT0iMzAwIDE2ODMuOSIgc3Ryb2tlLWRhc2hvZmZzZXQ9Ii03MzciLz4KICAgICAgPGNpcmNsZSBjeD0iNTEyIiBjeT0iNTEyIiByPSIyNjgiIHN0cm9rZT0idXJsKCNnMSkiIHN0cm9rZS1kYXNoYXJyYXk9IjUyMCAxNjgzLjkiIHN0cm9rZS1kYXNob2Zmc2V0PSItNTkiLz4KICAgIDwvZz4KICAgIDxnIGZpbGw9IiNmZmYiPgogICAgICA8cmVjdCB4PSI0MzIiIHk9IjUzMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjgwIiByeD0iMjAiIG9wYWNpdHk9Ii41NSIvPgogICAgICA8cmVjdCB4PSI0OTIiIHk9IjQ3MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjE0MCIgcng9IjIwIiBvcGFjaXR5PSIuOCIvPgogICAgICA8cmVjdCB4PSI1NTIiIHk9IjQyMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjE5MCIgcng9IjIwIiBmaWxsPSIjMjFDMzdBIi8+CiAgICA8L2c+CiAgICA8cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSI1MjAiIGZpbGw9InVybCgjc2hlZW4pIi8+CiAgICA8cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTAxOCIgaGVpZ2h0PSIxMDE4IiByeD0iMjI4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIuMTQiIHN0cm9rZS13aWR0aD0iNiIvPgogIDwvZz4KPC9zdmc+Cg==" alt=""><div class="large">Бюджет</div></div><span style="display:flex;gap:8px;align-items:center"><button class="gbtn glass" id="aiBtn" aria-label="Нейросеть и данные" style="font-size:17px;color:${AICONF.key()?"var(--inc)":"var(--muted)"}">✦</button>${profBtn().replace(`class="prof glass"`,`class="prof glass sm"`)}</span></div>
+    <div class="hero">
       <div class="lbl">Капитал</div>
       <div class="bal" id="bal">${fmt(S.shownBal)}</div>
-      <div class="mline">${MONTHS[today.getMonth()]}: <span class="inc">${fmt(t.inc,true)}</span> · <span class="exp">${fmt(-t.exp)}</span></div>
-      ${cap.reserved||(S.set.assets.length&&cap.inv)?`<div class="mline" style="font-size:13.5px;margin-top:4px">${S.set.assets.length&&S.set.invInclude?`в т.ч. инвестиции ${fmt(cap.inv)}`:""}${S.set.assets.length&&S.set.invInclude&&cap.reserved?" · ":""}${cap.reserved?`отложено отдельно ${fmt(cap.reserved)}`:""}</div>`:""}
-      <div class="accs">${S.set.accounts.map(a=>`<button class="acc${a.exclude?" off":""}" data-acc="${a.id}">${esc(a.icon)} ${esc(a.name)} <b>${fmt(accBalance(a.id))}</b></button>`).join("")}</div>
-      <div class="acts4">
+      <div class="net ${t.net>0?"up":t.net<0?"down":""}">${fmt(t.net,true)}<span class="per">за ${MONTHS[today.getMonth()].toLowerCase()}</span></div>
+      ${cap.reserved||(S.set.assets.length&&cap.inv)?`<div class="mline sub">${S.set.assets.length&&S.set.invInclude?`в т.ч. инвестиции ${fmt(cap.inv)}`:""}${S.set.assets.length&&S.set.invInclude&&cap.reserved?" · ":""}${cap.reserved?`отложено отдельно ${fmt(cap.reserved)}`:""}</div>`:""}
+      <div class="accs center">${S.set.accounts.map(a=>`<button class="acc${a.exclude?" off":""}" data-acc="${a.id}">${esc(a.icon)} ${esc(a.name)} <b>${fmt(accBalance(a.id))}</b></button>`).join("")}</div>
+    </div>
+    <div class="acts4">
         <button id="aTr"><i><svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></i>Перевод</button>
         <button id="aLim"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></i>Лимиты</button>
         <button id="aAdv"><i><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L19 9.5l-4.2 3.1L16.2 18 12 15l-4.2 3 1.4-5.4L5 9.5l5.2-1.6z"/></svg></i>Советы</button>
         <button id="aAcc"><i><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/></svg></i>Счета</button>
-      </div>
     </div>
     ${over.length?`<button class="alert" id="overAlert">⚠️ <span><b>Перерасход</b> · ${over.map(o=>`${esc(o.cat)} ${fmt(o.sp-o.lim,true)}`).join(", ")}</span></button>`:""}
     <div class="voice${rec?" on":""}" id="voice">
       <div class="micw"><span class="ring"></span><span class="ring r2"></span>
-        <button class="mic" id="mic" aria-label="${rec?"Остановить запись":"Надиктовать операцию"}">${rec?ICON.stop:ICON.mic}</button></div>
+        <button class="mic" id="mic" aria-label="${rec?"Остановить запись":"Надиктовать операцию"}"><span class="orb" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="mi" id="micIco">${rec?ICON.stop:ICON.mic}</span></button></div>
       <div class="cap" id="micCap">${rec?"Слушаю… нажми, чтобы закончить":"Нажми и скажи, что потратил"}</div>
     </div>
     <form class="compose glass" id="aiForm">
@@ -593,29 +664,35 @@ function home(){
     </form>
     ${AICONF.key()?"":`<button class="alert" id="noKey" style="background:var(--fill);color:var(--fg)">✦ <span><b>Подключи нейросеть</b> · вставь ключ OpenRouter, чтобы записывать голосом</span></button>`}
     <div id="tipBox">${S.tip?tipHtml():""}</div>
-    <div id="reply">${S.last||""}</div>
-    <div class="hdr"><span>Операции</span><span style="display:flex;gap:16px"><button id="searchBtn">${S.search===null?"Поиск":"Готово"}</button><button id="selBtn">${S.selecting?"Готово":"Выбрать"}</button></span></div>
-    ${S.search!==null?`<input class="search" id="search" type="search" placeholder="Поиск" value="${esc(S.search)}" autocomplete="off">`:""}
-    <div id="txList">${listHtml(filtered())}</div>`;
+    <div id="reply">${S.last||""}</div>`;
   countUp($("bal"),cap.total);
-  wireProf();
+  wireProf();$("aiBtn").onclick=()=>{S.aiFrom="home";go("aiset","push");};
   document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>openAcc(b.dataset.acc));
   $("aTr").onclick=()=>openTransfer();$("aLim").onclick=()=>{S.limFrom="home";S.ym=[today.getFullYear(),today.getMonth()];go("budgets","push");};
   $("aAdv").onclick=()=>go("stats","enter");$("aAcc").onclick=()=>go("more","enter");
-  if($("noKey"))$("noKey").onclick=()=>go("aiset","push");
+  if($("noKey"))$("noKey").onclick=()=>{S.aiFrom="home";go("aiset","push");};
   if($("overAlert"))$("overAlert").onclick=()=>{S.ym=[today.getFullYear(),today.getMonth()];S.limFrom="home";go("budgets","push");};
-  $("searchBtn").onclick=()=>{S.search=S.search===null?"":null;render();if(S.search!==null)$("search").focus();};
+  wireAI();
+}
+const OPF=[["all","Все"],["expense","Расходы"],["income","Доходы"],["transfer","Переводы"]];
+function opsScreen(){
+  $("screen").innerHTML=`
+    <div class="ptitle"><div class="large">Операции</div><button class="prof glass" id="selBtn" style="max-width:none">${S.selecting?"Готово":"Выбрать"}</button></div>
+    <input class="search" id="search" type="search" placeholder="Поиск: кафе, такси, сумма…" value="${esc(S.search||"")}" autocomplete="off">
+    <div class="seg" style="margin-bottom:6px">${OPF.map(([k,l])=>`<button data-opf="${k}" aria-pressed="${(S.opf||"all")===k}">${l}</button>`).join("")}</div>
+    <div id="txList">${listHtml(filtered())}</div>`;
   $("selBtn").onclick=()=>S.selecting?exitSelect():enterSelect();
-  if($("search"))$("search").oninput=e=>{S.search=e.target.value;refreshList();};
-  wireAI();wireList();
+  $("search").oninput=e=>{S.search=e.target.value;refreshList();};
+  document.querySelectorAll("[data-opf]").forEach(b=>b.onclick=()=>{S.opf=b.dataset.opf;document.querySelectorAll("[data-opf]").forEach(x=>x.setAttribute("aria-pressed",x===b));refreshList();});
+  wireList();
 }
 function refreshList(){if($("txList")){$("txList").innerHTML=listHtml(filtered());wireList();}}
-function filtered(){const q=(S.search||"").trim().toLowerCase();let it=sorted();
+function filtered(){const q=(S.search||"").trim().toLowerCase();let it=sorted();const f=S.opf||"all";if(f!=="all")it=it.filter(x=>f==="transfer"?(x.type==="transfer"||x.type==="adjust"):x.type===f);
   if(q)it=it.filter(x=>[x.cat,x.note,accById(x.account)?.name,String(x.amount)].join(" ").toLowerCase().includes(q));return it;}
 function listHtml(items){
   const q=(S.search||"").trim();
-  if(!items.length)return `<div class="empty"><b>${q?"Ничего не нашлось":S.ready?"Пока пусто":"Загружаю…"}</b>${q?"":"Нажми на микрофон и скажи, что потратил."}</div>`;
-  const lim=q||S.showAll||S.selecting?300:12;
+  if(!items.length)return `<div class="empty"><b>${q?"Ничего не нашлось":S.ready?"Пока пусто":"Загружаю…"}</b>${q?"":"Скажи на главном экране, что потратил, и операции появятся здесь."}</div>`;
+  const lim=q||S.showAll||S.selecting?1000:60;
   return txList(items.slice(0,lim))+(items.length>lim?`<button class="more" id="showAll">Показать все</button>`:"");
 }
 function wireList(){wireTx();if($("showAll"))$("showAll").onclick=()=>{S.showAll=true;refreshList();};}
@@ -674,21 +751,31 @@ async function deleteTxs(ids){
 }
 
 // ================= VOICE =================
-let rec=null,micBlocked=false,heard="";
+let rec=null,micBlocked=false,heard="",micT=0,capT=0;const queue=[];
 function tipHtml(){return `<div class="tip glass pop-up">🎤 Не получилось включить микрофон. Проверь, что в Настройках iPhone включены Siri и диктовка, или нажми значок микрофона на клавиатуре, скажи, что потратил, и нажми стрелку.</div>`;}
+function capMsg(t){const c=$("micCap");if(!c)return;c.textContent=t;clearTimeout(capT);capT=setTimeout(micUI,3500);}
 function startMic(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR||micBlocked){fallbackMic();return;}
-  try{rec=new SR();rec.lang="ru-RU";rec.interimResults=true;rec.continuous=true;heard="";
-    rec.onresult=e=>{let s="";for(const r of e.results)s+=r[0].transcript;heard=s;const ta=$("aiText");if(ta){ta.value=s;autosize();}};
-    rec.onerror=e=>{const blocked=["not-allowed","service-not-allowed","audio-capture"].includes(e.error);rec=null;if(blocked){micBlocked=true;micUI();fallbackMic();}else micUI();};
-    rec.onend=()=>{const txt=heard.trim();rec=null;micUI();if(txt&&!busy){const ta=$("aiText");if(ta){ta.value="";autosize();}runAI(txt,null);}};
-    rec.start();micUI();if(navigator.vibrate)navigator.vibrate(10);
-  }catch{rec=null;micBlocked=true;fallbackMic();}
+  if(rec){try{rec.abort();}catch{}rec=null;}
+  try{
+    const r=new SR();rec=r;heard="";
+    r.lang="ru-RU";r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+    r.onresult=e=>{if(rec!==r)return;let s="";for(const x of e.results)s+=x[0].transcript;heard=s;const ta=$("aiText");if(ta){ta.value=s;autosize();}};
+    r.onerror=e=>{if(["not-allowed","service-not-allowed"].includes(e.error)){micBlocked=true;rec=null;micUI();fallbackMic();}
+      else if(e.error==="no-speech")capMsg("Ничего не услышал — нажми и попробуй ещё раз");
+      else if(e.error==="audio-capture")capMsg("Микрофон занят — попробуй ещё раз");};
+    r.onend=()=>{if(rec!==r)return;rec=null;clearTimeout(micT);micUI();const txt=heard.trim();heard="";
+      if(txt){const ta=$("aiText");if(ta){ta.value="";autosize();}submitText(txt);}};
+    r.start();micUI();if(navigator.vibrate)navigator.vibrate(10);
+    clearTimeout(micT);micT=setTimeout(()=>{try{r.stop();}catch{}},25000);
+  }catch{rec=null;micUI();capMsg("Не удалось включить микрофон — нажми ещё раз");}
 }
-function stopMic(){try{rec&&rec.stop();}catch{rec=null;micUI();}}
-function micUI(){const v=$("voice");if(!v)return;v.classList.toggle("on",!!rec);const m=$("mic");m.innerHTML=rec?ICON.stop:ICON.mic;
-  $("micCap").textContent=rec?"Слушаю… нажми, чтобы закончить":"Нажми и скажи, что потратил";}
+function stopMic(){const r=rec;if(!r)return;try{r.stop();}catch{}
+  setTimeout(()=>{if(rec===r){try{r.abort();}catch{}rec=null;micUI();const txt=heard.trim();heard="";if(txt)submitText(txt);}},1800);}
+function micUI(){const v=$("voice");if(!v)return;v.classList.toggle("on",!!rec);v.classList.toggle("busy",!rec&&busy);$("micIco").innerHTML=rec?ICON.stop:ICON.mic;$("mic").setAttribute("aria-label",rec?"Остановить запись":"Надиктовать операцию");
+  $("micCap").textContent=rec?"Слушаю… договори — запишу сам":busy?(queue.length?`Разбираю… ещё в очереди: ${queue.length}`:"Разбираю… можно говорить следующее"):"Нажми и скажи, что потратил";}
+function submitText(txt){if(busy){queue.push(txt);micUI();return;}runAI(txt,null);}
 function fallbackMic(){S.tip=true;$("tipBox").innerHTML=tipHtml();const ta=$("aiText");ta.placeholder="Нажми 🎤 на клавиатуре и говори";ta.focus();}
 const autosize=()=>{const ta=$("aiText");if(!ta)return;ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight,140)+"px";};
 
@@ -697,14 +784,14 @@ let busy=false;
 function wireAI(){
   const ta=$("aiText");ta.oninput=autosize;
   ta.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("aiForm").requestSubmit();}};
-  $("aiForm").onsubmit=e=>{e.preventDefault();const v=ta.value.trim();if(v&&!busy){ta.value="";autosize();S.tip=false;$("tipBox").innerHTML="";runAI(v,null);}};
-  $("mic").onclick=()=>{if(busy)return;rec?stopMic():startMic();};
+  $("aiForm").onsubmit=e=>{e.preventDefault();const v=ta.value.trim();if(v){ta.value="";autosize();S.tip=false;$("tipBox").innerHTML="";submitText(v);}};
+  $("mic").onclick=()=>{rec?stopMic():startMic();};
   $("photoBtn").onclick=()=>$("photo").click();
-  $("aiSend").disabled=busy;
+  micUI();
 }
-$("photo").onchange=()=>{const f=$("photo").files[0];$("photo").value="";if(f&&!busy)runAI("",f);};
+$("photo").onchange=()=>{const f=$("photo").files[0];$("photo").value="";if(f){if(busy){toast("Подожди, разбираю предыдущую запись");return;}runAI("",f);}};
 function showReply(html,anim){S.last=html;const r=$("reply");if(!r)return;r.innerHTML=html;if(anim&&!RM&&r.firstElementChild)r.firstElementChild.classList.add("pop-up");}
-const SAMPLE_ERR={no_key:"Добавь ключ нейросети: Счета → Нейросеть и данные.",bad_key:"Ключ нейросети не подошёл. Проверь его в разделе «Нейросеть и данные».",no_credits:"На OpenRouter закончился баланс или лимит ключа.",blocked:"OpenRouter отказал в доступе. Попробуй другую модель в настройках.",network:"Нет связи с нейросетью. Проверь интернет.",upstream_error:"Нейросеть временно недоступна. Попробуй через минуту.",empty_completion:"Нейросеть ничего не ответила. Попробуй ещё раз.",not_granted:"Странице не разрешили обращаться к Claude. Обнови страницу и нажми «Разрешить».",rate_limited:"Лимит запросов исчерпан (бесплатно — 50 в день). Попробуй позже.",invalid_json:"Не понял ответ. Попробуй ещё раз.",sampling_disabled:"Claude недоступен для этого аккаунта.",session_expired:"Нужно заново войти в аккаунт.",image_rejected:"Не получилось прочитать фото.",images_unavailable:"Фото здесь не поддерживается."};
+const SAMPLE_ERR={no_key:"Добавь ключ нейросети: Счета → Нейросеть и данные.",bad_key:"Ключ нейросети не подошёл. Проверь его в разделе «Нейросеть и данные».",no_credits:"На OpenRouter закончился баланс или лимит ключа.",blocked:"OpenRouter отказал в доступе. Попробуй другую модель в настройках.",network:"Нет связи с нейросетью. Проверь интернет.",upstream_error:"Нейросеть временно недоступна. Попробуй через минуту.",empty_completion:"Нейросеть ничего не ответила. Попробуй ещё раз.",not_granted:"Странице не разрешили обращаться к Claude. Обнови страницу и нажми «Разрешить».",timeout:"Нейросеть долго не отвечает. Попробуй ещё раз.",rate_limited:"Лимит запросов исчерпан (бесплатно — 50 в день). Попробуй позже.",invalid_json:"Не понял ответ. Попробуй ещё раз.",sampling_disabled:"Claude недоступен для этого аккаунта.",session_expired:"Нужно заново войти в аккаунт.",image_rejected:"Не получилось прочитать фото.",images_unavailable:"Фото здесь не поддерживается."};
 async function runAI(text,file){
   if(S.view!=="home")go("home","enter");
   const q=`<div class="q">${file?"📷 Фото чека":"«"+esc(text)+"»"}</div>`;
@@ -712,7 +799,7 @@ async function runAI(text,file){
   const sample=await claude.use("sample");
   if(!sample){showReply(`<div class="reply">${q}Claude недоступен в этом окне. Открой страницу в приложении Claude.</div>`);return;}
   if(!S.col){showReply(`<div class="reply">${q}Чтобы сохранять, открой страницу в Claude под своим аккаунтом.</div>`);return;}
-  busy=true;if($("aiSend"))$("aiSend").disabled=true;
+  busy=true;micUI();
   const d=new Date();
   const prompt=`Ты ассистент в приложении учёта личных финансов. Валюта — рубли. Сегодня ${iso(d)}, ${d.toLocaleDateString("ru-RU",{weekday:"long"})}.
 ${file?"Пользователь прислал фото чека, квитанции или скриншот банковской операции. Для чека — одна операция на итоговую сумму, категория по содержимому, в note — магазин.":`Пользователь надиктовал голосом или написал (возможны ошибки распознавания речи, числа могут быть словами):\n"""${text}"""`}
@@ -759,7 +846,7 @@ ${summary()}
     showReply(`<div class="reply">${q}<div>${esc(res?.reply||(saved.length?"Записал.":"Не нашёл, что записать."))}</div>${li?`<ul>${li}</ul><div style="margin-top:8px"><button class="link" data-undo="${saved.map(s=>s.id).join(",")}">Отменить</button></div>`:""}</div>`,true);
     if(saved.length&&navigator.vibrate)navigator.vibrate([8,40,8]);
   }catch(err){showReply(`<div class="reply">${q}${SAMPLE_ERR[err?.code]||"Что-то пошло не так. Попробуй ещё раз."}</div>`,true);}
-  finally{busy=false;if($("aiSend"))$("aiSend").disabled=false;}
+  finally{busy=false;micUI();if(queue.length){const n=queue.shift();setTimeout(()=>runAI(n,null),60);}}
 }
 document.addEventListener("click",async e=>{const u=e.target.closest("[data-undo]");if(!u)return;u.disabled=true;
   for(const id of u.dataset.undo.split(",")){try{await S.col.doc(id).delete()}catch{}}
@@ -931,6 +1018,7 @@ function more(){
   const limTotal=Object.values(S.set.budgets).reduce((s,v)=>s+(+v||0),0);
   const groups=Object.keys(ACC_KINDS).map(k=>[k,S.set.accounts.filter(a=>(a.kind||"other")===k)]).filter(([k,l])=>l.length);
   $("screen").innerHTML=`<div class="ptitle"><div class="large">Счета</div>${profBtn()}</div>
+    <div class="group menu" style="margin-bottom:12px"><button id="toAI"><span class="ico" style="background:var(--inc);color:#fff">✦</span><span class="nm">Нейросеть и данные<small>${AICONF.key()?"ключ добавлен · резервная копия":"нужно вставить ключ OpenRouter"}</small></span><span class="chev">›</span></button></div>
     <div class="group menu">
       ${groups.map(([k,l])=>l.map(a=>`<button data-acc="${a.id}"><span class="ico">${esc(a.icon)}</span><span class="nm">${esc(a.name)}<small>${ACC_KINDS[k][0]}${a.exclude?" · не в капитале":""}</small></span><span class="sub">${fmt(accBalance(a.id))}</span><span class="chev">›</span></button>`).join("")).join("")}
       <button id="newAcc"><span class="ico" style="color:var(--tint)">＋</span><span class="nm" style="color:var(--tint)">Новый счёт</span></button>
@@ -940,14 +1028,13 @@ function more(){
       <button id="toTransfer"><span class="ico">⇄</span><span class="nm">Перевод между счетами</span><span class="chev">›</span></button>
       <button id="toBudgets"><span class="ico">🎯</span><span class="nm">Лимиты по категориям</span><span class="sub">${limTotal?fmt(limTotal):""}</span><span class="chev">›</span></button>
       <button id="toRec"><span class="ico">🔁</span><span class="nm">Регулярные платежи</span><span class="sub">${S.set.recurring.length||""}</span><span class="chev">›</span></button>
-      <button id="toAI"><span class="ico">✦</span><span class="nm">Нейросеть и данные<small>${AICONF.key()?"ключ добавлен":"нужен ключ OpenRouter"}</small></span><span class="chev">›</span></button>
       <button id="toProf"><span class="ico">👥</span><span class="nm">Профили</span><span class="sub">${S.profiles.length}</span><span class="chev">›</span></button>
     </div>`;
   wireProf();
   document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>openAcc(b.dataset.acc));
   $("newAcc").onclick=()=>openAcc(null);
   $("toTransfer").onclick=()=>openTransfer();
-  $("toBudgets").onclick=()=>{S.limFrom="more";go("budgets");};$("toRec").onclick=()=>go("recurring");$("toAI").onclick=()=>go("aiset");$("toProf").onclick=()=>{S.profFrom="more";go("profiles");};
+  $("toBudgets").onclick=()=>{S.limFrom="more";go("budgets");};$("toRec").onclick=()=>go("recurring");$("toAI").onclick=()=>{S.aiFrom="more";go("aiset");};$("toProf").onclick=()=>{S.profFrom="more";go("profiles");};
 }
 
 // ================= ACCOUNT EDIT =================
@@ -1028,7 +1115,7 @@ function recurring(){
 
 // ================= PROFILES =================
 function profilesScreen(){
-  $("screen").innerHTML=`${navBack({home:"Обзор",stats:"Аналитика",invest:"Инвестиции",more:"Счета"}[S.profFrom||"home"])}<div class="large">Профили</div>
+  $("screen").innerHTML=`${navBack({home:"Обзор",stats:"Аналитика",invest:"Инвестиции",more:"Счета",ops:"Операции"}[S.profFrom||"home"])}<div class="large">Профили</div>
     <div class="lbl" style="margin:0 16px 10px">У каждого профиля свои счета, операции, лимиты и инвестиции.</div>
     <div class="group menu">${S.profiles.map(p=>`<button data-pick="${esc(p.id)}"><span class="ico">${esc(p.icon)}</span><span class="nm">${esc(p.name)}</span>${p.id===S.pid?`<span class="check">✓</span>`:""}<span class="link" data-ren="${esc(p.id)}" role="button" tabindex="0" style="margin-left:8px">Изменить</span></button>`).join("")}</div>
     <div id="pForm"></div>
@@ -1061,7 +1148,8 @@ function switchProfile(pid){if(pid===S.pid){go(S.profFrom||"home","pop");return;
   S.pid=pid;S.shownBal=0;S.last=null;S.advice=null;saveProfiles();applyProfile();runRecurring();go("home","enter");
   toast(`Профиль: ${(S.profiles.find(p=>p.id===pid)||{}).name}`);}
 function applyProfile(){S.txs=S.allTx.filter(t=>(t.p||"main")===S.pid);const set=S.allSet[S.pid];
-  S.set={...DEF_SET(),...(set?clone(set):{})};if(!S.set.accounts?.length)S.set.accounts=DEF_SET().accounts;}
+  S.set={...DEF_SET(),...(set?clone(set):{})};if(!S.set.accounts?.length)S.set.accounts=DEF_SET().accounts;
+  for(const ac of S.set.accounts)if(!ac.kind)ac.kind=ac.id==="card"?"card":ac.id==="cash"?"cash":"other";}
 
 // ================= ADD / EDIT TX =================
 function openForm(tx,type){
@@ -1074,8 +1162,8 @@ function openForm(tx,type){
   go("add","push");
 }
 function addScreen(){
-  const F=S.form;const back=["stats","more","accEdit"].includes(S.formFrom)?S.formFrom:"home";
-  const backTitle={home:"Обзор",stats:"Аналитика",more:"Счета",accEdit:"Счёт"}[back];
+  const F=S.form;const back=["stats","more","accEdit","ops"].includes(S.formFrom)?S.formFrom:"home";
+  const backTitle={home:"Обзор",stats:"Аналитика",more:"Счета",accEdit:"Счёт",ops:"Операции"}[back];
   const doDelete=async()=>{const data={...S.edit};const id=data.id;delete data.id;
     try{await S.col.doc(id).delete();go(back,"pop");toast("Операция удалена",async()=>{try{await S.col.doc(id).set(data);}catch{}});}catch{$("fErr").textContent="Не удалось удалить.";}};
   if(F.type==="adjust"){
@@ -1128,10 +1216,10 @@ function addScreen(){
 function openTransfer(edit){
   const accs=S.set.accounts;const f=accs[0]?.id,t=(accs.find(a=>a.id!==f)||accs[0])?.id;
   S.tr=edit?{from:edit.account,to:edit.to,amt:String(edit.amount).replace(".",","),note:edit.note||"",date:edit.date,edit}:{from:f,to:t,amt:"",note:"",date:iso(new Date()),edit:null};
-  S.trPick=null;S.trDone=null;S.trBack=["more","accEdit"].includes(S.view)?S.view:"home";go("transfer","push");
+  S.trPick=null;S.trDone=null;S.trBack=["more","accEdit","ops"].includes(S.view)?S.view:"home";go("transfer","push");
 }
 function transferScreen(){
-  const T=S.tr,back=S.trBack,bt={home:"Обзор",more:"Счета",accEdit:"Счёт"}[back];
+  const T=S.tr,back=S.trBack,bt={home:"Обзор",more:"Счета",accEdit:"Счёт",ops:"Операции"}[back];
   if(S.trDone){const D=S.trDone;
     $("screen").innerHTML=`<div class="done"><svg class="ok" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/><path d="M30 52l13 13 27-29"/></svg>
       <div class="lbl" style="font-size:16px">${D.edit?"Перевод изменён":"Перевод выполнен"}</div><div class="big">${fmt(D.amount)}</div>
@@ -1181,7 +1269,8 @@ function transferScreen(){
 // ================= AI KEY & BACKUP (standalone) =================
 function aiScreen(){
   const k=AICONF.key();
-  $("screen").innerHTML=`${navBack("Счета")}<div class="large">Нейросеть и данные</div>
+  const back=S.aiFrom||"more";
+  $("screen").innerHTML=`${navBack(back==="home"?"Обзор":"Счета")}<div class="large">Нейросеть и данные</div>
     <div class="hdr"><span>Нейросеть (OpenRouter)</span></div>
     <div class="card" style="display:grid;gap:12px">
       <label class="lab"><span>Ключ API</span><input class="field" id="kKey" type="password" value="${esc(k)}" placeholder="sk-or-v1-…" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
@@ -1198,7 +1287,7 @@ function aiScreen(){
       <input type="file" id="bFile" accept="application/json,.json" hidden>
       <div class="lbl" id="bRes"></div>
     </div>`;
-  wireBack("more");
+  wireBack(back);
   const save=()=>{const set=(n,v)=>{try{if(v)localStorage.setItem(n,JSON.stringify(v));else localStorage.removeItem(n);}catch{}};
     set("ai:key",$("kKey").value.trim());set("ai:model",$("kM").value.trim());set("ai:modelSmart",$("kM2").value.trim());};
   $("kSave").onclick=()=>{save();toast("Сохранено");};
@@ -1246,7 +1335,8 @@ setTimeout(()=>{let last=0;try{last=+localStorage.getItem("px:last")||0;}catch{}
     if(prof&&Array.isArray(prof.list)&&prof.list.length){S.profiles=prof.list;if(first&&prof.current&&prof.list.some(p=>p.id===prof.current))S.pid=prof.current;}
     if(!S.profiles.some(p=>p.id===S.pid))S.pid=S.profiles[0].id;
     applyProfile();S.ready=true;
-    if(S.view==="home"){if(!busyTyping()&&!rec&&!openRow&&!S.selecting)render();else if(!openRow)refreshList();}
+    if(S.view==="home"){if(!busyTyping()&&!rec)render();}
+    else if(S.view==="ops"){if(!busyTyping()&&!openRow&&!S.selecting)render();else if(!openRow)refreshList();}
     else if(!["add","accEdit","assetEdit","profiles","transfer"].includes(S.view)&&!busyTyping())render();
     if(first&&!snap.metadata.fromCache){first=false;if(!sets[S.pid])saveSet();else writeWatch();runRecurring();}
   },()=>{S.ready=true;render();note("Не удалось загрузить записи. Обнови страницу.");});
