@@ -6,13 +6,13 @@
 <title>Карманный бюджет</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Бюджет">
 <meta name="theme-color" content="#000000">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<style>html{color-scheme:dark}body{margin:0}:root{padding-top:env(safe-area-inset-top,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+<style>html{color-scheme:dark}body{margin:0}body::before{display:none!important}[hidden]{display:none!important}img{max-width:100%}</style>
 <style>
 /* Layout: iOS-style app — large titles, inset grouped cards, floating Liquid Glass tab bar; screens push/pop with motion */
 :root{
@@ -297,6 +297,13 @@ select.field{appearance:none}
 /* invest */
 .pl{font-size:15px;margin-top:4px;font-weight:600}
 .stale{font-size:12.5px;color:var(--muted);margin-top:8px}
+/* odometer digits */
+.od{display:inline-block;height:1.05em;overflow:hidden;vertical-align:bottom}
+.odi{display:flex;flex-direction:column;animation:.6s var(--ease) both;animation-delay:calc(var(--k)*40ms)}
+.odi b{display:block;height:1.05em;line-height:1.05em;font-weight:inherit;text-align:center}
+.od.up .odi{animation-name:odup}.od.dn .odi{animation-name:oddn}
+@keyframes odup{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+@keyframes oddn{from{transform:translateY(-50%)}to{transform:translateY(0)}}
 /* home hero */
 .net{display:inline-flex;align-items:baseline;gap:6px;margin-top:8px;font-size:18px;font-weight:600;color:var(--muted)}
 .net.up{color:var(--inc)}
@@ -359,6 +366,56 @@ select.field{appearance:none}
 @keyframes popup{from{opacity:0;transform:scale(.92) translateY(8px)}}
 .spin{display:inline-block;width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:4px}
 @keyframes sp{to{transform:rotate(360deg)}}
+
+/* ---- larger touch targets & tab bar pinned to the very bottom ---- */
+.tabbar{padding:0 max(10px,env(safe-area-inset-left,0px)) max(6px,calc(env(safe-area-inset-bottom,0px) - 16px)) max(10px,env(safe-area-inset-right,0px))}
+.tabs{width:100%;max-width:500px;padding:6px;justify-content:space-between}
+.tabs button{flex:1;min-width:0;padding:9px 2px 8px;font-size:11.5px;gap:3px}
+.tabs button svg{width:27px;height:27px}
+.pill{top:6px;bottom:6px}
+#screen{padding-bottom:calc(104px + max(6px,calc(env(safe-area-inset-bottom,0px) - 16px)))}
+#screen.fit,#screen.fit.enter,#screen.fit.push,#screen.fit.pop{padding-bottom:calc(96px + max(6px,calc(env(safe-area-inset-bottom,0px) - 16px)))}
+.selbar{bottom:calc(98px + max(6px,calc(env(safe-area-inset-bottom,0px) - 16px)))}
+.toast{bottom:calc(98px + max(6px,calc(env(safe-area-inset-bottom,0px) - 16px)))}
+.btn{padding:17px;font-size:17.5px}
+.btn.sm{padding:13px 18px;font-size:16px}
+.gbtn{width:46px;height:46px}
+.gbtn svg{width:22px;height:22px}
+.back{font-size:18px;padding:10px 8px 10px 0}
+.back svg{width:24px;height:24px}
+.prof{padding:10px 14px 10px 11px;font-size:16px}
+.prof.sm{padding:10px 12px;font-size:19px}
+.hdr button{font-size:16.5px;padding:6px 0}
+.link{font-size:16px}
+.acc{padding:10px 14px;font-size:15px}
+.acts4 button{font-size:13.5px;gap:7px}
+.acts4 i{width:56px;height:56px}
+.acts4 svg{width:24px;height:24px}
+#screen.fit .acts4 i{width:52px;height:52px}
+#screen.fit .micw,#screen.fit .mic{width:96px;height:96px}
+#screen.fit .mic svg{width:34px;height:34px}
+.rb{width:48px;height:48px}
+.rb svg{width:24px;height:24px}
+.compose textarea{min-height:48px;font-size:17.5px;padding:12px 8px}
+.chiprow button{padding:10px 16px;font-size:16px}
+.seg button{padding:9px 10px;font-size:15px}
+.qa button{padding:10px 16px;font-size:15px}
+.pad button{padding:15px 0;font-size:28px}
+.tx{padding:12px 16px}
+.ico{width:42px;height:42px;font-size:20px}
+.menu button{padding:13px 16px}
+.menu .ico{width:36px;height:36px;font-size:18px}
+.crow{padding:12px 0}
+.cats button{padding:13px 3px 11px;font-size:12px}
+.cats button span{font-size:26px}
+.field{padding:14px 15px;font-size:17.5px}
+.limit{width:104px;padding:9px 11px;font-size:17px}
+.search{padding:12px 14px;font-size:17.5px}
+.trash{width:50px;height:50px}
+.x{font-size:16px;padding:8px 4px}
+.selbar button{padding:11px 18px;font-size:16px}
+.toast button{padding:9px 16px;font-size:15px}
+@media (max-height:700px){#screen.fit .micw,#screen.fit .mic{width:70px;height:70px}#screen.fit .acts4 i{width:42px;height:42px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -630,6 +687,19 @@ let toastT;
 function toast(text,undo){$("toastText").textContent=text;const b=$("toastBtn");b.hidden=!undo;b.onclick=async()=>{hideToast();if(undo)await undo();};
   $("toast").classList.add("show");clearTimeout(toastT);toastT=setTimeout(hideToast,5000);}
 function hideToast(){$("toast").classList.remove("show");}
+// odometer: only the digits that actually changed roll, one step each
+function odo(el,to){
+  const from=S.shownBal;S.shownBal=to;el.setAttribute("aria-label",fmt(to));
+  const settled=S.readyAt&&performance.now()-S.readyAt>900;
+  if(RM||from===to||!settled){el.textContent=fmt(to);return;}
+  const up=to>from,pa=[...fmt(from)].reverse(),pb=[...fmt(to)].reverse(),out=[];let k=0;
+  for(let i=0;i<pb.length;i++){const nc=pb[i],oc=pa[i];
+    if(/\d/.test(nc)&&oc!==nc){const o=/\d/.test(oc||"")?oc:"&nbsp;";
+      out.push(`<span class="od ${up?"up":"dn"}"><span class="odi" style="--k:${k++}">${up?`<b>${o}</b><b>${nc}</b>`:`<b>${nc}</b><b>${o}</b>`}</span></span>`);}
+    else out.push(esc(nc));}
+  el.innerHTML=out.reverse().join("");
+  if(navigator.vibrate)navigator.vibrate(6);
+}
 function countUp(el,to){const from=S.shownBal;S.shownBal=to;if(RM||from===to){el.textContent=fmt(to);return;}
   const t0=performance.now(),d=700;const step=t=>{const p=Math.min((t-t0)/d,1),e=1-Math.pow(1-p,3);el.textContent=fmt(from+(to-from)*e);if(p<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
 
@@ -665,7 +735,7 @@ function home(){
     ${AICONF.key()?"":`<button class="alert" id="noKey" style="background:var(--fill);color:var(--fg)">✦ <span><b>Подключи нейросеть</b> · вставь ключ OpenRouter, чтобы записывать голосом</span></button>`}
     <div id="tipBox">${S.tip?tipHtml():""}</div>
     <div id="reply">${S.last||""}</div>`;
-  countUp($("bal"),cap.total);
+  odo($("bal"),cap.total);
   wireProf();$("aiBtn").onclick=()=>{S.aiFrom="home";go("aiset","push");};
   document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>openAcc(b.dataset.acc));
   $("aTr").onclick=()=>openTransfer();$("aLim").onclick=()=>{S.limFrom="home";S.ym=[today.getFullYear(),today.getMonth()];go("budgets","push");};
@@ -1145,7 +1215,7 @@ function profForm(id){
     S.profiles=S.profiles.filter(x=>x.id!==id);if(S.pid===id)S.pid="main";delete S.allSet[id];saveProfiles();applyProfile();render();toast("Профиль удалён");};
 }
 function switchProfile(pid){if(pid===S.pid){go(S.profFrom||"home","pop");return;}
-  S.pid=pid;S.shownBal=0;S.last=null;S.advice=null;saveProfiles();applyProfile();runRecurring();go("home","enter");
+  S.pid=pid;S.shownBal=0;S.readyAt=performance.now();S.last=null;S.advice=null;saveProfiles();applyProfile();runRecurring();go("home","enter");
   toast(`Профиль: ${(S.profiles.find(p=>p.id===pid)||{}).name}`);}
 function applyProfile(){S.txs=S.allTx.filter(t=>(t.p||"main")===S.pid);const set=S.allSet[S.pid];
   S.set={...DEF_SET(),...(set?clone(set):{})};if(!S.set.accounts?.length)S.set.accounts=DEF_SET().accounts;
@@ -1334,7 +1404,7 @@ setTimeout(()=>{let last=0;try{last=+localStorage.getItem("px:last")||0;}catch{}
     S.allTx=txs;S.allSet=sets;
     if(prof&&Array.isArray(prof.list)&&prof.list.length){S.profiles=prof.list;if(first&&prof.current&&prof.list.some(p=>p.id===prof.current))S.pid=prof.current;}
     if(!S.profiles.some(p=>p.id===S.pid))S.pid=S.profiles[0].id;
-    applyProfile();S.ready=true;
+    applyProfile();S.ready=true;if(!S.readyAt)S.readyAt=performance.now();
     if(S.view==="home"){if(!busyTyping()&&!rec)render();}
     else if(S.view==="ops"){if(!busyTyping()&&!openRow&&!S.selecting)render();else if(!openRow)refreshList();}
     else if(!["add","accEdit","assetEdit","profiles","transfer"].includes(S.view)&&!busyTyping())render();
