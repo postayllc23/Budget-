@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Бюджет"><meta name="theme-color" content="#000000"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" type="image/png" href="icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Бюджет"><meta name="theme-color" content="#000000"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" type="image/png" href="icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:var(--sab,env(safe-area-inset-bottom,0px))}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Карманный бюджет</title>
 <style>
 /* Layout: iOS-style app — large titles, inset grouped cards, floating Liquid Glass tab bar; screens push/pop with motion */
@@ -29,10 +29,10 @@ button{cursor:pointer}
 html,body{height:100%;overflow:hidden}
 .wrap{position:fixed;inset:0;max-width:520px;margin:0 auto;display:flex;flex-direction:column;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(6px + env(safe-area-inset-top,0px)) 0}
 .wrap>.notice{flex:none}
-#screen{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px));margin-inline:-4px;padding-inline:4px}
+#screen{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:calc(110px + var(--sab,env(safe-area-inset-bottom,0px)));margin-inline:-4px;padding-inline:4px}
 #screen::-webkit-scrollbar{display:none}
 /* home is a fixed one-screen layout: only the operations list scrolls */
-#screen.fit,#screen.fit.enter,#screen.fit.push,#screen.fit.pop{overflow:hidden;display:flex;flex-direction:column;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+#screen.fit,#screen.fit.enter,#screen.fit.push,#screen.fit.pop{overflow:hidden;display:flex;flex-direction:column;padding-bottom:calc(88px + var(--sab,env(safe-area-inset-bottom,0px)))}
 #screen.fit>*{flex:none}
 #screen.fit>#txList{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:20px;padding-bottom:12px;
   -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent)}
@@ -45,7 +45,10 @@ html,body{height:100%;overflow:hidden}
 #screen.fit .acts4{margin-top:12px}
 #screen.fit .acts4 i{width:44px;height:44px}
 #screen.fit .voice{padding:12px 0 2px;gap:6px;grid-template-columns:auto;}
-#screen.fit .micw,#screen.fit .mic{width:clamp(120px,38vw,156px);height:clamp(120px,38vw,156px)}
+/* mic orb scales to whatever height is left, never overlapping neighbours */
+#screen.fit .voice{display:grid;grid-template-rows:minmax(0,1fr) auto;justify-items:center;align-items:center}
+#screen.fit .micw{width:auto;height:100%;max-height:156px;max-width:156px;min-height:64px;aspect-ratio:1/1}
+#screen.fit .mic{width:100%;height:100%}
 #screen.fit .mic svg{width:46px;height:46px}
 #screen.fit .voice .cap{font-size:15px}
 #screen.fit .compose{margin-top:10px}
@@ -54,7 +57,7 @@ html,body{height:100%;overflow:hidden}
 #screen.fit .hdr{margin:14px 16px 6px}
 #screen.fit .alert{margin-top:8px;padding:9px 12px;font-size:14px}
 #screen.fit .reply{margin-top:8px;max-height:30vh;overflow-y:auto}
-@media (max-height:700px){#screen.fit .mline{display:none}#screen.fit .acts4{margin-top:8px;gap:2px}#screen.fit .acts4 button{font-size:11px;gap:3px}#screen.fit .acts4 i{width:36px;height:36px}#screen.fit .acts4 svg{width:18px;height:18px}#screen.fit .voice{padding-top:6px}#screen.fit .micw,#screen.fit .mic{width:104px;height:104px}#screen.fit .mic svg{width:36px;height:36px}#screen.fit .hero .bal{font-size:40px}}
+@media (max-height:700px){#screen.fit .mline{display:none}#screen.fit .acts4{margin-top:8px;gap:2px}#screen.fit .acts4 button{font-size:11px;gap:3px}#screen.fit .acts4 i{width:36px;height:36px}#screen.fit .acts4 svg{width:18px;height:18px}#screen.fit .voice{padding-top:6px}#screen.fit .mic svg{width:36px;height:36px}#screen.fit .hero .bal{font-size:40px}}
 .glass{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);
   box-shadow:inset 0 1px 0 var(--glass-hi),inset 0 0 0 .5px var(--glass-hi),0 0 0 .5px var(--glass-rim),0 10px 30px rgba(0,0,0,.12)}
 .nav{display:flex;align-items:center;gap:8px;min-height:44px;margin-top:2px}
@@ -164,17 +167,17 @@ html,body{height:100%;overflow:hidden}
 .empty{background:var(--surface);border-radius:22px;padding:22px 18px;text-align:center;color:var(--muted);font-size:15px}
 .empty b{display:block;color:var(--fg);margin-bottom:4px;font-weight:600}
 .more{display:block;width:100%;border:0;background:none;color:var(--tint);padding:14px;font-size:16px}
-.selbar{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:35;transform:translate(-50%,30px);opacity:0;pointer-events:none;display:flex;gap:8px;align-items:center;border-radius:999px;padding:6px 6px 6px 18px;font-size:15px;font-weight:500;white-space:nowrap;transition:transform .45s var(--spring),opacity .25s}
+.selbar{position:fixed;left:50%;bottom:calc(84px + var(--sab,env(safe-area-inset-bottom,0px)));z-index:35;transform:translate(-50%,30px);opacity:0;pointer-events:none;display:flex;gap:8px;align-items:center;border-radius:999px;padding:6px 6px 6px 18px;font-size:15px;font-weight:500;white-space:nowrap;transition:transform .45s var(--spring),opacity .25s}
 .selbar.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .selbar button{border:0;border-radius:999px;padding:9px 16px;font-weight:600;font-size:15px}
 .selbar .d{background:var(--exp);color:#fff}
 .selbar .c{background:var(--fill)}
 /* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;pointer-events:none;
-  padding:0 max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+  padding:0 max(12px,env(safe-area-inset-right,0px)) calc(10px + var(--sab,env(safe-area-inset-bottom,0px))) max(12px,env(safe-area-inset-left,0px))}
 .tabbar{transition:transform .45s var(--ease),opacity .3s}
 .notabs .tabbar{transform:translateY(130%);opacity:0;pointer-events:none}
-.notabs #screen.fit{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.notabs #screen.fit{padding-bottom:calc(14px + var(--sab,env(safe-area-inset-bottom,0px)))}
 .tabs{pointer-events:auto;display:flex;gap:0;padding:5px;border-radius:999px;position:relative;max-width:100%}
 .tabs button{position:relative;z-index:1;border:0;background:none;border-radius:999px;padding:7px 6px 6px;display:grid;justify-items:center;gap:1px;font-size:10.5px;font-weight:600;color:var(--muted);min-width:62px;transition:color .25s}
 .tabs button svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -389,7 +392,7 @@ select.field{appearance:none}
 .done .big{font-size:40px;font-weight:700;letter-spacing:-.03em;animation:popup .5s .3s var(--spring) both}
 .done .route{color:var(--muted);font-size:16px;animation:popup .5s .4s var(--spring) both}
 /* toast */
-.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:40;transform:translate(-50%,20px);opacity:0;pointer-events:none;max-width:calc(100% - 32px);
+.toast{position:fixed;left:50%;bottom:calc(92px + var(--sab,env(safe-area-inset-bottom,0px)));z-index:40;transform:translate(-50%,20px);opacity:0;pointer-events:none;max-width:calc(100% - 32px);
   border-radius:999px;padding:10px 10px 10px 18px;display:flex;gap:14px;align-items:center;font-size:15px;font-weight:500;transition:transform .45s var(--spring),opacity .25s}
 .toast.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .toast button{border:0;background:var(--tint);color:var(--on-tint);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px;flex:none}
@@ -547,6 +550,10 @@ async function aiJSON(prompt,opts={}){const c=aiCfg();if(!c.key)throw aiErr("no_
       body:JSON.stringify({model,temperature:.2,messages:[{role:"user",content:imgs.length?[{type:"text",text:prompt},...imgs.map(i=>({type:"image_url",image_url:{url:`data:${i.mime};base64,${i.data}`}}))]:prompt}]})});
     text=j.choices?.[0]?.message?.content;if(Array.isArray(text))text=text.map(x=>x.text||"").join("");}
   return parseJSON(text);}
+function fixSab(){const st=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  const portrait=innerHeight>=innerWidth;const gap=(portrait?Math.max(screen.height,screen.width):Math.min(screen.height,screen.width))-innerHeight;
+  if(st&&gap>30)document.documentElement.style.setProperty("--sab","4px");else document.documentElement.style.removeProperty("--sab");}
+fixSab();addEventListener("resize",fixSab);addEventListener("orientationchange",()=>setTimeout(fixSab,300));
 const claude={use:async n=>n==="db"?LDB:n==="user"?{id:async()=>"local"}:n==="sample"?(aiCfg().key?{json:aiJSON}:null):null};
 const ICON={back:'<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
   mic:'<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
@@ -583,7 +590,7 @@ function saveSet(){if(!S.col)return;const body=clone(S.set);const ref=S.col.doc(
 let profChain=Promise.resolve();
 function saveProfiles(){if(!S.col)return;const body={list:clone(S.profiles),current:S.pid};const ref=S.col.doc("profiles");profChain=profChain.then(()=>ref.set(body)).catch(()=>note("Не удалось сохранить профили."));}
 async function addTx(tx){const ref=await S.col.add({...tx,p:S.pid,kind:"tx",created:Date.now()});return ref.id;}
-function note(t){const n=$("notice");n.textContent=t;n.hidden=!t;}
+function note(t){const n=$("notice");n.textContent=t;n.hidden=!t;n.onclick=()=>{n.hidden=true;};}
 let lastWatch="";
 function writeWatch(){if(!S.db)return;const m={};for(const [pid,set] of Object.entries({...S.allSet,[S.pid]:S.set}))for(const a of (set.assets||[]))m[a.id]={id:a.id,ticker:a.ticker,kind:a.kind,name:a.name||""};
   const items=Object.values(m).sort((a,b)=>a.id.localeCompare(b.id));const j=JSON.stringify(items);if(j===lastWatch)return;lastWatch=j;
@@ -1527,7 +1534,7 @@ addEventListener("resize",()=>{fixOrient();});
       else if(v.date&&(v.amount>0||v.type==="adjust"))txs.push({id:d.id,...v});}
     const sig=JSON.stringify([txs,sets,prof]);const same=sig===S.dataSig;S.dataSig=sig;
     if(same&&!first)return;
-    S.allTx=txs;S.allSet=sets;
+    S.allTx=txs;S.allSet=sets;if(txs.length&&/Импорт данных/.test($("notice").textContent))note("");
     if(prof&&Array.isArray(prof.list)&&prof.list.length){S.profiles=prof.list;if(first&&prof.current&&prof.list.some(p=>p.id===prof.current))S.pid=prof.current;}
     if(!S.profiles.some(p=>p.id===S.pid))S.pid=S.profiles[0].id;
     applyProfile();S.ready=true;if(!first)checkGoals();
